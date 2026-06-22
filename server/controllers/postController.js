@@ -88,6 +88,40 @@ module.exports.getPostById = async (req, res, next) => {
 	}
 };
 
+// ─── PATCH /api/posts/:id ────────────────────────────────────────────────────
+// Edit a post. Allowed for: the post's own author, OR an admin.
+module.exports.editPost = async (req, res, next) => {
+	try {
+		const { title, body } = req.body;
+		const post = await Post.findById(req.params.id);
+
+		if (!post) {
+			return res.status(404).send({ message: "Post not found" });
+		}
+
+		// Check permissions: Owner or Admin
+		const isOwner = post.author.toString() === req.user._id.toString();
+		const isAdmin = req.user.role === "admin";
+
+		if (!isOwner && !isAdmin) {
+			return res.status(403).send({ message: "You are not allowed to edit this post" });
+		}
+
+		// Update fields if provided
+		if (title && title.trim().length > 0) post.title = title.trim();
+		if (body && body.trim().length > 0) post.body = body.trim();
+
+		const updatedPost = await post.save();
+
+		return res.status(200).send({
+			message: "Post updated successfully",
+			result:  updatedPost
+		});
+	} catch (error) {
+		next(error);
+	}
+};
+
 // ─── DELETE /api/posts/:id ────────────────────────────────────────────────────
 // Allowed for: the post's own author, OR an admin.
 // Deleting a post also cascades to its comments so the Comment collection

@@ -225,6 +225,52 @@
       });
     } catch (error) {}
   };
+
+  // ─── ADMIN EDIT STATES ─────────────────────────────────────────────────────
+  const editPostModalRef = ref(null);
+  let editPostModalInstance = null;
+  const adminEditPostForm = reactive({ id: '', title: '', body: '' });
+
+  const editCommentModalRef = ref(null);
+  let editCommentModalInstance = null;
+  const adminEditCommentForm = reactive({ id: '', postId: '', body: '' });
+
+  const openAdminEditPost = (post) => {
+    adminEditPostForm.id = post._id;
+    adminEditPostForm.title = post.title;
+    adminEditPostForm.body = post.body;
+    if (!editPostModalInstance && editPostModalRef.value) {
+      editPostModalInstance = new bootstrap.Modal(editPostModalRef.value);
+    }
+    editPostModalInstance?.show();
+  };
+
+  const submitAdminEditPost = async () => {
+    if (!adminEditPostForm.title || !adminEditPostForm.body) return;
+    await globalStore.editPost(adminEditPostForm.id, { title: adminEditPostForm.title, body: adminEditPostForm.body });
+    editPostModalInstance?.hide();
+  };
+
+  const openAdminEditComment = (comment) => {
+    adminEditCommentForm.id = comment._id;
+    adminEditCommentForm.postId = comment.post_id?._id || comment.post_id;
+    adminEditCommentForm.body = comment.body;
+    if (!editCommentModalInstance && editCommentModalRef.value) {
+      editCommentModalInstance = new bootstrap.Modal(editCommentModalRef.value);
+    }
+    editCommentModalInstance?.show();
+  };
+
+  const submitAdminEditComment = async () => {
+    if (!adminEditCommentForm.body) return;
+    await globalStore.editComment(adminEditCommentForm.postId, adminEditCommentForm.id, { body: adminEditCommentForm.body });
+    
+    // Update local comments array to reflect changes immediately in the table
+    const target = comments.value.find(c => c._id === adminEditCommentForm.id);
+    if (target) target.body = adminEditCommentForm.body;
+
+    editCommentModalInstance?.hide();
+  };
 </script>
 
 <template>
@@ -288,9 +334,8 @@
                       {{ new Date(comment.createdAt).toLocaleDateString() }}
                     </td>
                     <td class="text-end">
-                      <button class="btn btn-sm btn-danger" @click="handleDeleteComment(comment)">
-                        Delete
-                      </button>
+                      <button class="btn btn-sm btn-outline-primary me-2" @click="openAdminEditComment(comment)">Edit</button>
+                      <button class="btn btn-sm btn-danger" @click="handleDeleteComment(comment)">Delete</button>
                     </td>
                   </tr>
                 </tbody>
@@ -344,9 +389,8 @@
                       {{ new Date(post.createdAt).toLocaleDateString() }}
                     </td>
                     <td class="text-end">
-                      <button class="btn btn-sm btn-danger" @click="handleDeletePost(post._id, post.title)">
-                        Delete
-                      </button>
+                      <button class="btn btn-sm btn-outline-primary me-2" @click="openAdminEditPost(post)">Edit</button>
+                      <button class="btn btn-sm btn-danger" @click="handleDeletePost(post._id, post.title)">Delete</button>
                     </td>
                   </tr>
                 </tbody>
@@ -634,6 +678,50 @@
               </button>
             </div>
           </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" ref="editPostModalRef" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="background-color: #f4ebd8; border: 1px solid #c2b29f;">
+        <div class="modal-header border-bottom-0">
+          <h5 class="modal-title text-dark">Edit Post</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body pt-0">
+          <div class="mb-3">
+            <label class="form-label small">Title</label>
+            <input v-model="adminEditPostForm.title" type="text" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label small">Body</label>
+            <textarea v-model="adminEditPostForm.body" class="form-control" rows="5"></textarea>
+          </div>
+          <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-primary" @click="submitAdminEditPost">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" ref="editCommentModalRef" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="background-color: #f4ebd8; border: 1px solid #c2b29f;">
+        <div class="modal-header border-bottom-0">
+          <h5 class="modal-title text-dark">Edit Comment</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body pt-0">
+          <div class="mb-3">
+            <label class="form-label small">Comment Body</label>
+            <textarea v-model="adminEditCommentForm.body" class="form-control" rows="3"></textarea>
+          </div>
+          <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-primary" @click="submitAdminEditComment">Save Changes</button>
+          </div>
         </div>
       </div>
     </div>

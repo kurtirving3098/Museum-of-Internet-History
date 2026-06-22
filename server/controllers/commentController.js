@@ -129,3 +129,40 @@ module.exports.getAllComments = async (req, res, next) => {
 		next(error);
 	}
 };
+
+// ─── PATCH /api/posts/:postId/comments/:id ────────────────────────────────────
+// Edit a comment. Allowed for: the comment's own author, OR an admin.
+module.exports.editComment = async (req, res, next) => {
+	try {
+		const { body } = req.body;
+		const comment = await Comment.findById(req.params.id);
+
+		if (!comment) {
+			return res.status(404).send({ message: "Comment not found" });
+		}
+
+		// Check permissions: Owner or Admin
+		const isCommentOwner = comment.author.toString() === req.user._id.toString();
+		const isAdmin        = req.user.role === "admin";
+
+		// Note: Unlike deletion, we typically don't let a Post Author edit someone else's comment, 
+		// so we only check if they own the comment or are a global admin.
+		if (!isCommentOwner && !isAdmin) {
+			return res.status(403).send({ message: "You are not allowed to edit this comment" });
+		}
+
+		if (!body || body.trim().length === 0) {
+			return res.status(400).send({ message: "Comment body cannot be empty" });
+		}
+
+		comment.body = body.trim();
+		const updatedComment = await comment.save();
+
+		return res.status(200).send({
+			message: "Comment updated successfully",
+			result:  updatedComment
+		});
+	} catch (error) {
+		next(error);
+	}
+};

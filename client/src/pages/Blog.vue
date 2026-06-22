@@ -106,6 +106,50 @@
     globalStore.deletePost(postId);
   };
 
+  // ─── Edit Post (Inline) ────────────────────────────────────────────────
+  const editingPostId = ref(null);
+  const editPostDraft = reactive({ title: '', body: '' });
+
+  const startEditPost = (post) => {
+    editingPostId.value = post._id;
+    editPostDraft.title = post.title;
+    editPostDraft.body  = post.body;
+  };
+
+  const cancelEditPost = () => {
+    editingPostId.value = null;
+  };
+
+  const submitEditPost = async (postId) => {
+    if (!editPostDraft.title.trim() || !editPostDraft.body.trim()) return;
+    // Assuming you add an editPost action to your globalStore:
+    await globalStore.editPost(postId, {
+      title: editPostDraft.title.trim(),
+      body:  editPostDraft.body.trim()
+    });
+    editingPostId.value = null;
+  };
+
+  // ─── Edit Comment (Inline) ─────────────────────────────────────────────
+  const editingCommentId = ref(null);
+  const editCommentDraft = ref('');
+
+  const startEditComment = (comment) => {
+    editingCommentId.value = comment._id;
+    editCommentDraft.value = comment.body;
+  };
+
+  const cancelEditComment = () => {
+    editingCommentId.value = null;
+  };
+
+  const submitEditComment = async (postId, commentId) => {
+    if (!editCommentDraft.value.trim()) return;
+    // Assuming you add an editComment action to your globalStore:
+    await globalStore.editComment(postId, commentId, { body: editCommentDraft.value.trim() });
+    editingCommentId.value = null;
+  };
+
   // ─── Avatar initials fallback ──────────────────────────────────────────
   const initials = (name) => {
     if (!name) return '?';
@@ -248,10 +292,7 @@
 
             <div class="d-flex justify-content-between align-items-start mb-2">
               <div class="d-flex align-items-center gap-2">
-                <div
-                  class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center"
-                  style="width: 40px; height: 40px; font-size: 1.1rem;"
-                >
+                <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-size: 1.1rem;">
                   {{ initials(post.author?.username) }}
                 </div>
                 <div>
@@ -260,17 +301,22 @@
                 </div>
               </div>
 
-              <button
-                v-if="globalStore.canDeletePost(post)"
-                class="btn btn-sm btn-outline-danger"
-                @click="handleDeletePost(post._id)"
-              >
-                Delete
-              </button>
+              <div v-if="globalStore.canDeletePost(post)">
+                <button class="btn btn-sm btn-outline-primary me-2" @click="startEditPost(post)">Edit</button>
+                <button class="btn btn-sm btn-outline-danger" @click="handleDeletePost(post._id)">Delete</button>
+              </div>
             </div>
 
-            <h5 class="card-title">{{ post.title }}</h5>
-            <p class="card-text">{{ post.body }}</p>
+            <div v-if="editingPostId === post._id" class="mb-3">
+              <input v-model="editPostDraft.title" type="text" class="form-control mb-2">
+              <textarea v-model="editPostDraft.body" class="form-control mb-2" rows="3"></textarea>
+              <button class="btn btn-sm btn-success me-2" @click="submitEditPost(post._id)">Save</button>
+              <button class="btn btn-sm btn-secondary" @click="cancelEditPost">Cancel</button>
+            </div>
+            <div v-else>
+              <h5 class="card-title">{{ post.title }}</h5>
+              <p class="card-text">{{ post.body }}</p>
+            </div>
 
             <button class="btn btn-sm btn-outline-secondary mb-3" @click="toggleComments(post._id)">
               {{ expandedPostIds.has(post._id) ? 'Hide' : 'View' }} comments ({{ post.comment_count || 0 }})
@@ -284,22 +330,23 @@
               </div>
 
               <div v-else>
-                <div
-                    v-for="comment in globalStore.commentsByPostId[post._id]"
-                    :key="comment._id"
-                    class="comment-item d-flex justify-content-between align-items-start mb-2 p-2 rounded"
-                  >
-                  <div>
+                <div v-for="comment in globalStore.commentsByPostId[post._id]" :key="comment._id" class="comment-item d-flex justify-content-between align-items-start mb-2 p-2 rounded">
+                  
+                  <div class="flex-grow-1 me-3">
                     <span class="fw-bold small text-primary">{{ comment.author?.username || 'Unknown' }}</span>
-                    <span class="ms-2 small text-dark">{{ comment.body }}</span>
+                    
+                    <div v-if="editingCommentId === comment._id" class="mt-1 d-flex gap-2">
+                      <input v-model="editCommentDraft" type="text" class="form-control form-control-sm">
+                      <button class="btn btn-sm btn-success" @click="submitEditComment(post._id, comment._id)">Save</button>
+                      <button class="btn btn-sm btn-secondary" @click="cancelEditComment">Cancel</button>
+                    </div>
+                    <span v-else class="ms-2 small text-dark">{{ comment.body }}</span>
                   </div>
-                  <button
-                    v-if="globalStore.canDeleteComment(comment, post)"
-                    class="btn btn-sm btn-link text-danger p-0 ms-2"
-                    @click="handleDeleteComment(post._id, comment._id)"
-                  >
-                    Delete
-                  </button>
+
+                  <div v-if="globalStore.canDeleteComment(comment, post)" class="text-nowrap">
+                    <button class="btn btn-sm btn-link text-primary p-0" @click="startEditComment(comment)">Edit</button>
+                    <button class="btn btn-sm btn-link text-danger p-0 ms-2" @click="handleDeleteComment(post._id, comment._id)">Delete</button>
+                  </div>
                 </div>
 
                 <div

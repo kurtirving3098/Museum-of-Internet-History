@@ -100,23 +100,6 @@ export const tagApi = {
   listByDomain: (domain) => api.get('/tags', { params: { domain } }),
 };
 
-// ─── Posts ────────────────────────────────────────────────────────────────────
-export const postApi = {
-  create:   (payload) => api.post('/posts', payload),
-  getFeed:  (params) => api.get('/posts', { params }), // { page, limit, author }
-  getById:  (id) => api.get(`/posts/${id}`),
-  remove:   (id) => api.delete(`/posts/${id}`),
-};
-
-// ─── Comments ──────────────────────────────────────────────────────────────────
-export const commentApi = {
-  create:        (postId, body) => api.post(`/posts/${postId}/comments`, { body }),
-  getForPost:    (postId) => api.get(`/posts/${postId}/comments`),
-  remove:        (id) => api.delete(`/comments/${id}`), // note: route mounted as /api/posts/:postId/comments/:id in this app
-  // Admin-only global view, mounted directly on the app at /api/comments
-  getAll: (params) => api.get('/comments', { params }), // { page, limit }
-};
-
 // ─── Admin Curation ────────────────────────────────────────────────────────────
 export const adminApi = {
   getQueue: () => api.get('/admin/artifacts?status=pending'),
@@ -139,6 +122,24 @@ export const adminApi = {
 
   // One-way soft delete — no unhide counterpart exists on the backend.
   hideExhibit: (id) => api.patch(`/admin/exhibits/${id}/hide`),
+};
+
+// ─── Posts ────────────────────────────────────────────────────────────────────
+export const postApi = {
+  create:   (payload) => api.post('/posts', payload),
+  getFeed:  (params) => api.get('/posts', { params }), 
+  getById:  (id) => api.get(`/posts/${id}`),
+  edit:     (id, payload) => api.patch(`/posts/${id}`, payload), // <-- Add this
+  remove:   (id) => api.delete(`/posts/${id}`),
+};
+
+// ─── Comments ──────────────────────────────────────────────────────────────────
+export const commentApi = {
+  create:        (postId, body) => api.post(`/posts/${postId}/comments`, { body }),
+  getForPost:    (postId) => api.get(`/posts/${postId}/comments`),
+  edit:          (postId, id, body) => api.patch(`/posts/${postId}/comments/${id}`, { body }), // <-- Add this
+  remove:        (id) => api.delete(`/comments/${id}`), 
+  getAll:        (params) => api.get('/comments', { params }), 
 };
 
 export default api;

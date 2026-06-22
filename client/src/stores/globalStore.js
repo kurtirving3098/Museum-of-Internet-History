@@ -232,6 +232,32 @@ export const useGlobalStore = defineStore('global', {
       }
     },
 
+    async editPost(postId, payload) {
+      try {
+        const { data } = await api.patch(`/posts/${postId}`, payload);
+        notyf.success('Post updated successfully');
+
+        // Patch the local state so the UI updates instantly without a refetch
+        const updatedPost = data.result;
+        const idx = this.posts.findIndex((p) => p._id === postId);
+        if (idx !== -1) {
+          // Merge to preserve nested populated fields (like author) that the 
+          // PATCH route might not return in full.
+          this.posts[idx] = { ...this.posts[idx], ...updatedPost };
+        }
+
+        // Keep the single-post view in sync if it's currently open
+        if (this.currentPost && this.currentPost._id === postId) {
+          this.currentPost = { ...this.currentPost, ...updatedPost };
+        }
+        
+        return true;
+      } catch (error) {
+        notyf.error(error.response?.data?.message || 'Could not update post');
+        return false;
+      }
+    },
+
     // ─── COMMENTS ──────────────────────────────────────────────────────────
 
     async fetchAllComments(page = 0) {
@@ -282,6 +308,29 @@ export const useGlobalStore = defineStore('global', {
       } catch (error) {
         notyf.error(error.response?.data?.message || 'Could not delete comment');
         throw error;
+      }
+    },
+
+    async editComment(postId, commentId, payload) {
+      try {
+        const { data } = await api.patch(`/posts/${postId}/comments/${commentId}`, payload);
+        notyf.success('Comment updated successfully');
+
+        // Patch the local state so the UI updates instantly
+        const updatedComment = data.result;
+        const thread = this.commentsByPostId[postId];
+        
+        if (thread) {
+          const idx = thread.findIndex((c) => c._id === commentId);
+          if (idx !== -1) {
+            thread[idx] = { ...thread[idx], ...updatedComment };
+          }
+        }
+        
+        return true;
+      } catch (error) {
+        notyf.error(error.response?.data?.message || 'Could not update comment');
+        return false;
       }
     },
 
