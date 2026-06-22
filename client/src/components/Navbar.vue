@@ -31,6 +31,11 @@
   const goToAdmin = () => {
     router.push('/admin');
   };
+
+  // ─── Bug Fix: Route to Profile ──────────────────────────────────────────
+  const goToProfile = () => {
+    router.push('/profile');
+  };
 </script>
 
 <template>
@@ -94,7 +99,15 @@
           </template>
 
           <template v-else-if="!globalStore.isAdmin">
-            <span class="text-white fw-bold">{{ globalStore.user?.username }}</span>
+            <!-- Fixed: Added click handler and pointer cursor to username -->
+            <span 
+              class="text-white fw-bold me-2" 
+              style="cursor: pointer;" 
+              @click="goToProfile"
+              title="Go to profile"
+            >
+              {{ globalStore.user?.username }}
+            </span>
             <button class="btn-nav btn-outline-nav px-3 py-2" @click="handleLogout">Logout</button>
           </template>
 

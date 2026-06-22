@@ -60,7 +60,27 @@ const changeTheme = (name) => {
 
         </div>
 
+        <!-- Museum Exhibit Audio Note -->
+        <div class="row justify-content-center mt-5">
+          <div class="col-md-8">
+            <div class="audio-immersion-note p-3">
+              <span class="note-icon me-2">🎵</span>
+              <strong>Exhibit Audio Note:</strong> Activating a nostalgic era style automatically initializes our custom 
+              <strong>imeem Media Player</strong> in the lower section of your viewport. Each configuration features a curated 
+              period-accurate playlist designed to deliver a fully immersive, authentic 2000s social profiling experience.
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
 </template>
+
+<style scoped>
+.audio-immersion-note {
+  font-size: 0.85rem;
+  text-align: left;
+  transition: all 0.3s ease-in-out;
+}
+</style>

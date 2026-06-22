@@ -8,7 +8,7 @@
 }
 
 [data-theme="emo"] body { 
-  background: url('./images/emobackground2.jpg');
+  background: url('/images/emobackground2.jpg');
 }
 @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap');
 
@@ -50,7 +50,7 @@ body {
       rgba(10, 10, 12, 0.50), 
       rgba(10, 10, 12, 0.50)
     ),
-    url('./images/emobackground2.jpg') no-repeat center center;
+    url('/images/emobackground2.jpg') no-repeat center center;
   background-size: cover;
   background-attachment: fixed;
   
@@ -231,6 +231,10 @@ ul { list-style: none; }
   border: 1px solid rgba(170, 0, 221, 0.3);
 }
 
+#nav.navbar {
+  margin-bottom: 0 !important;
+}
+
 /* ─── HERO SECTION ──────────────────────────────────────────────────── */
 #hero {
   min-height: 100vh;
@@ -252,7 +256,13 @@ ul { list-style: none; }
       rgba(5, 0, 5, 0.20) 45%,
       rgba(5, 0, 5, 0.65) 100%
     ),
-    url('./images/emo.jpg') no-repeat center center / cover;
+    url('/images/emo.jpg') no-repeat center center / cover;
+}
+
+/* Alternative in your src/assets/main.css */
+#hero, .hero-section {
+  padding-top: 0.1px; /* Acts as an invisible barrier against collapsing margins */
+  margin-top: 0 !important;
 }
 
 /* LEFT FLANK GIF — emogirl */
@@ -788,4 +798,16 @@ footer {
     padding: 1rem;
     border: 1px solid rgba(170, 0, 221, 0.3);
   }
+}
+
+.audio-immersion-note {
+  background-color: #050005;
+  border: 1px solid #aa00dd;
+  color: #ff69b4;
+  text-shadow: 0 0 8px rgba(255, 105, 180, 0.4);
+  box-shadow: 0 0 15px rgba(170, 0, 221, 0.4);
+  border-radius: 0px;
+}
+.audio-immersion-note strong {
+  color: #aa00dd;
 }

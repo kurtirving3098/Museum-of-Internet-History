@@ -593,3 +593,14 @@ footer {
   #nav { padding: 1.5rem; }
   .navbar-nav { background: var(--bg); padding: 1rem; border: var(--b-thick); }
 }
+
+.audio-immersion-note {
+  background-color: #121217;
+  border: 2px solid #d4af37;
+  color: #cccccc;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+.audio-immersion-note strong {
+  color: #ffffff;
+}

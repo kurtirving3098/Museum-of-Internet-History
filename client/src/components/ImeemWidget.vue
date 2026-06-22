@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
   currentTheme: {
@@ -8,81 +8,101 @@ const props = defineProps({
   }
 });
 
-// Map Spotify Playlist IDs to your themes
+// Local state to track whether the player window is minimized
+const isCollapsed = ref(false);
+
 const themePlaylists = {
-  emo: '37i9dQZF1DX9wa6XirBPv8',      // Spotify 'Emo Forever' playlist
-  gangster: '37i9dQZF1DX186v583rmzp', // Spotify '90s/00s Hip Hop' playlist
-  teen: '37i9dQZF1DWWvvyNmW9V9a'      // Spotify '00s Pop' playlist
+  emo: '0Gt1h09nS05v3gBT9xTpnp',      
+  gangster: '0dQXzZigsw1SBWnIE9pJGP', 
+  teen: '74hL0Jp3kEp5y1IUiPjfa0'      
 };
 
-// Compute the correct iframe URL dynamically
 const spotifyEmbedUrl = computed(() => {
   const playlistId = themePlaylists[props.currentTheme];
   if (!playlistId) return null;
-  // Using theme=0 forces the dark player which looks better in the Imeem wrapper
+  
+  // Note: Ensured template literal syntax is correctly resolved via ${playlistId}
   return `https://open.spotify.com/embed/playlist/${playlistId}?utm_source=generator&theme=0`;
 });
 </script>
 
 <template>
-  <!-- Only show the widget if a nostalgic theme is active and we have a playlist -->
   <div v-if="spotifyEmbedUrl && currentTheme !== 'default'" class="imeem-player">
-    <div class="imeem-header">
-      <span>imeem</span>
+    
+    <div class="imeem-header" @click="isCollapsed = !isCollapsed" title="Click to collapse/expand">
+      <span class="imeem-logo">Imeem Media Player</span>
+      <span class="imeem-toggle-icon">
+        {{ isCollapsed ? '[ + ]' : '[ − ]' }}
+      </span>
     </div>
-    <div class="imeem-track">
-      <iframe 
-        :src="spotifyEmbedUrl" 
-        width="100%" 
-        height="80" 
-        frameBorder="0" 
-        allowfullscreen="" 
-        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-        loading="lazy">
-      </iframe>
+    
+    <div v-show="!isCollapsed" class="imeem-body">
+      <div class="imeem-track">
+        <iframe 
+          :src="spotifyEmbedUrl" 
+          width="100%" 
+          height="80" 
+          frameBorder="0" 
+          allowfullscreen="" 
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+          loading="lazy">
+        </iframe>
+      </div>
+      <div class="text-center py-1 bg-black preview-notice">
+        * Preview Mode active. Log into Spotify in browser for full tracks.
+      </div>
     </div>
+
   </div>
 </template>
 
 <style scoped>
-/* Adapted from your emo.css base[cite: 4] */
 .imeem-player {
   position: fixed;
   bottom: 20px;
   right: 20px;
   width: 320px;
   background: #111;
-  border: 3px solid hotpink; /*[cite: 4] */
+  border: 3px solid hotpink; 
   color: white;
-  font-family: Verdana, sans-serif; /*[cite: 4] */
+  font-family: Verdana, sans-serif; 
   z-index: 9999;
-  box-shadow: 0 0 15px hotpink, 0 0 30px purple; /*[cite: 4] */
+  box-shadow: 0 0 15px hotpink, 0 0 30px purple; 
   border-radius: 4px;
   overflow: hidden;
 }
 
 .imeem-header {
-  background: linear-gradient(#ff5cc8, #8e44ad); /*[cite: 4] */
-  padding: 4px 8px;
-  font-weight: bold; /*[cite: 4] */
-  font-size: 14px;
-  text-shadow: 1px 1px 0px rgba(0,0,0,0.5);
+  background: linear-gradient(#ff5cc8, #8e44ad); 
+  padding: 6px 10px;
+  font-weight: bold;
+  font-size: 12px;
+  letter-spacing: 1px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  cursor: pointer;
+}
+
+.imeem-logo {
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.imeem-toggle-icon {
+  font-family: monospace;
+  font-size: 11px;
+  color: #fff;
 }
 
 .imeem-track {
-  padding: 4px; /*[cite: 4] */
   background: #000;
+  padding: 2px;
 }
 
-/* Optional: Make it change colors based on the theme globally */
-:global(body[data-theme="gangster"]) .imeem-player {
-  border-color: #ffd700;
-  box-shadow: 0 0 15px #ffd700, 0 0 30px #00ff66;
-}
-:global(body[data-theme="gangster"]) .imeem-header {
-  background: linear-gradient(#444, #111);
-  color: #ffd700;
+.preview-notice {
+  font-size: 9px; 
+  color: #888;
+  border-top: 1px solid #222;
 }
 </style>
