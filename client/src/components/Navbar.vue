@@ -2,10 +2,25 @@
   import { ref, onMounted, onUnmounted } from 'vue';
   import { useRouter } from 'vue-router';
   import { useGlobalStore } from '@/stores/globalStore';
+  import { useTheme } from '@/stores/useTheme'; // 1. Import your unified theme hook
 
   const router      = useRouter();
   const globalStore = useGlobalStore();
-  const emit        = defineEmits(['setTheme']); // Emit to Parent
+  
+  // 2. Pull reactive state and setter from the global theme hook
+  const { currentTheme, setTheme } = useTheme();
+
+  // ─── Theme Switcher Execution ─────────────────────────────────────────────
+  const isDropdownOpen = ref(false); // Add this to track dropdown visibility
+
+  const toggleDropdown = () => {
+    isDropdownOpen.value = !isDropdownOpen.value;
+  };
+
+  const changeTheme = (name) => {
+    setTheme(name); 
+    isDropdownOpen.value = false; // Close the menu automatically when a layout is chosen!
+  };
 
   // ─── Slim-on-scroll ──────────────────────────────────────────────────────
   const isSlim = ref(false);
@@ -14,15 +29,7 @@
   };
   onMounted(() => window.addEventListener('scroll', handleScroll));
   onUnmounted(() => window.removeEventListener('scroll', handleScroll));
-
-  // ─── Theme Switcher UI state ──────────────────────────────────────────────
-  const activeTheme = ref(localStorage.getItem('mih-theme') || 'default');
   
-  const changeTheme = (name) => {
-    activeTheme.value = name;
-    emit('setTheme', name);
-  };
-
   const handleLogout = () => {
     globalStore.logout();
     router.push('/');
@@ -32,7 +39,6 @@
     router.push('/admin');
   };
 
-  // ─── Bug Fix: Route to Profile ──────────────────────────────────────────
   const goToProfile = () => {
     router.push('/profile');
   };
@@ -70,25 +76,29 @@
 
         <div class="d-flex gap-2 mt-2 mt-lg-0 align-items-center">
 
-          <!-- ── Theme / Layout Switcher ── -->
+         <!-- ── Theme / Layout Switcher ── -->
           <div class="dropdown">
+            <!-- 1. Added @click trigger and dynamic aria-expanded attribute -->
             <button class="btn-nav btn-outline-nav px-3 py-2 theme-toggle dropdown-toggle"
                     type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false">
+                    @click="toggleDropdown"
+                    :aria-expanded="isDropdownOpen">
               Layout
             </button>
-            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end theme-menu">
+            
+            <!-- 2. Added dynamic structural :class binding to force show/hide states -->
+            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end theme-menu"
+                :class="{ show: isDropdownOpen }">
               <li>
-                <button class="dropdown-item theme-item" :class="{ active: activeTheme === 'default' }" @click="changeTheme('default')">
+                <button class="dropdown-item theme-item" :class="{ active: currentTheme === 'default' }" @click="changeTheme('default')">
                   Default
                 </button>
               </li>
               <li><hr class="dropdown-divider"></li>
               <li><h6 class="dropdown-header">── Friendster ──</h6></li>
-              <li><button class="dropdown-item theme-item" :class="{ active: activeTheme === 'emo' }" @click="changeTheme('emo')">Emo</button></li>
-              <li><button class="dropdown-item theme-item" :class="{ active: activeTheme === 'gangster' }" @click="changeTheme('gangster')">Gangster</button></li>
-              <li><button class="dropdown-item theme-item" :class="{ active: activeTheme === 'teen' }" @click="changeTheme('teen')">Teen</button></li>
+              <li><button class="dropdown-item theme-item" :class="{ active: currentTheme === 'emo' }" @click="changeTheme('emo')">Emo</button></li>
+              <li><button class="dropdown-item theme-item" :class="{ active: currentTheme === 'gangster' }" @click="changeTheme('gangster')">Gangster</button></li>
+              <li><button class="dropdown-item theme-item" :class="{ active: currentTheme === 'teen' }" @click="changeTheme('teen')">Teen</button></li>
             </ul>
           </div>
 
@@ -99,7 +109,6 @@
           </template>
 
           <template v-else-if="!globalStore.isAdmin">
-            <!-- Fixed: Added click handler and pointer cursor to username -->
             <span 
               class="text-white fw-bold me-2" 
               style="cursor: pointer;" 
