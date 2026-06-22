@@ -1,4 +1,4 @@
-const WaybackService    = require('../services/WaybackService');
+const WaybackService    = require('../services/waybackService');
 const DiggingSession    = require('../models/DiggingSession');
 const User              = require('../models/User');
 
