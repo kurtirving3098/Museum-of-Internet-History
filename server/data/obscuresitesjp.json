@@ -1,0 +1,38 @@
+[
+  {
+    "id": "jp_001",
+    "name": "2channel (2ch)",
+    "url": "2ch.net",
+    "display_url": "2ch.net",
+    "category": "Forum",
+    "region": "JP",
+    "active_years": [1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012],
+    "description": "The anonymous imageboard that defined Japanese internet culture — birthplace of countless memes, subcultures, and the model for 4chan.",
+    "content_note": "Anonymous forum threads covering every topic imaginable in Japanese internet culture.",
+    "related": ["jp_002", "jp_003"]
+  },
+  {
+    "id": "jp_002",
+    "name": "Nifty Serve Web",
+    "url": "nifty.com",
+    "display_url": "nifty.com",
+    "category": "Portal",
+    "region": "JP",
+    "active_years": [1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005],
+    "description": "Japan's answer to AOL — one of the first mass-market internet portals that brought millions of Japanese users online for the first time.",
+    "content_note": "Email, news, chat rooms, and early Japanese web directories.",
+    "related": ["jp_001", "jp_003"]
+  },
+  {
+    "id": "jp_003",
+    "name": "GeoCities Japan",
+    "url": "geocities.co.jp",
+    "display_url": "geocities.co.jp",
+    "category": "Personal Pages",
+    "region": "JP",
+    "active_years": [1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009],
+    "description": "The Japanese branch of GeoCities — home to millions of personal pages featuring anime fan art, J-pop lyrics, and elaborate table-based layouts.",
+    "content_note": "Personal homepages, anime fan sites, and hobby pages in Japanese.",
+    "related": ["jp_001", "jp_002"]
+  }
+]

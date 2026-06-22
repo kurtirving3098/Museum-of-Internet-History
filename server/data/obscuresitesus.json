@@ -1,0 +1,38 @@
+[
+  {
+    "id": "us_001",
+    "name": "GeoCities USA",
+    "url": "geocities.com",
+    "display_url": "geocities.com",
+    "category": "Personal Pages",
+    "region": "US",
+    "active_years": [1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009],
+    "description": "The original wild west of personal web publishing — millions of pages, each a unique artifact of whoever built them and whenever they built them.",
+    "content_note": "Personal homepages, fan sites, hobbyist pages, and early web experiments.",
+    "related": ["us_002", "us_003"]
+  },
+  {
+    "id": "us_002",
+    "name": "Angelfire",
+    "url": "angelfire.com",
+    "display_url": "angelfire.com",
+    "category": "Personal Pages",
+    "region": "US",
+    "active_years": [1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007],
+    "description": "GeoCities' scrappier rival — where the backgrounds were more chaotic, the MIDI music louder, and the under-construction GIFs more animated.",
+    "content_note": "Fan fiction, personal journals, early web art, and hobbyist communities.",
+    "related": ["us_001", "us_003"]
+  },
+  {
+    "id": "us_003",
+    "name": "Tripod",
+    "url": "tripod.com",
+    "display_url": "tripod.com",
+    "category": "Personal Pages",
+    "region": "US",
+    "active_years": [1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006],
+    "description": "The third pillar of early free web hosting — where college students built their first websites and bands posted their first MP3s.",
+    "content_note": "Student pages, band sites, early blogs, and community forums.",
+    "related": ["us_001", "us_002"]
+  }
+]
